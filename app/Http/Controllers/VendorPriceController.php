@@ -69,6 +69,11 @@ class VendorPriceController extends Controller
 
             Excel::import($import, $request->file('file'));
 
+            // Update last upload
+            $vendor->update([
+                'last_upload_at' => now(),
+            ]);
+
             return redirect()
                 ->route('vendor.prices.index')
                 ->with('success',
@@ -90,8 +95,10 @@ class VendorPriceController extends Controller
 
     public function downloadTemplate()
     {
+        $vendor = auth()->user()->vendor;
+
         return Excel::download(
-            new VendorTemplateExport,
+            new VendorTemplateExport($vendor->id),
             'template_harga_obat.xlsx'
         );
     }

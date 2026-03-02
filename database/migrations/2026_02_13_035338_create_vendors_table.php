@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('pic')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

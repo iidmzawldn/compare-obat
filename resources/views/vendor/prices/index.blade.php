@@ -47,7 +47,7 @@
                         <th>Nama Obat</th>
                         <th width="15%">Harga</th>
                         <th width="10%">Diskon</th>
-                        <th width="10%">Stok</th>
+                        <th width="10%">Harga Final</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,10 +60,10 @@
                                 Rp {{ number_format($price->price, 0, ',', '.') }}
                             </td>
                             <td>
-                                {{ $price->discount ?? '-' }}
+                                {{ $price->discount_percent ?? '-' }} %
                             </td>
                             <td>
-                                {{ $price->stock ?? '-' }}
+                               RP {{ number_format($price->final_price, 0, ',', '.') }}
                             </td>
                         </tr>
                     @empty

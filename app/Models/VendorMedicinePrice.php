@@ -13,8 +13,8 @@ class VendorMedicinePrice extends Model
         'vendor_id',
         'medicine_id',
         'price',
-        'discount',
-        'stock',
+        'discount_percent',
+        'final_price',
     ];
 
     public function medicine()

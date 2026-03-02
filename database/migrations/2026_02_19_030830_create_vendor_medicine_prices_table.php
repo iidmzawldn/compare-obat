@@ -23,8 +23,8 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->decimal('price', 15, 2);
-            $table->decimal('discount', 8, 2)->nullable();
-            $table->integer('stock')->nullable();
+            $table->integer('discount_percent')->default(0);
+            $table->decimal('final_price', 15, 2);
 
             $table->timestamps();
 

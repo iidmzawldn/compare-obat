@@ -5,52 +5,24 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // ADMIN
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@local.test'],
-            [
-                'name' => 'Administrator',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $admin->assignRole('admin');
+    $adminRole = Role::firstOrCreate([
+        'name' => 'admin',
+        'guard_name' => 'web'
+    ]);
 
+    $user = User::create([
+        'name' => 'Admin',
+        'email' => 'admin@gmail.com',
+        'password' => bcrypt('admin123'),
+    ]);
 
-        // FARMASI
-        $farmasi = User::firstOrCreate(
-            ['email' => 'farmasi@local.test'],
-            [
-                'name' => 'Farmasi',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $farmasi->assignRole('farmasi');
+    $user->assignRole($adminRole);
 
-
-        // VENDOR
-        $vendor = User::firstOrCreate(
-            ['email' => 'vendor@local.test'],
-            [
-                'name' => 'Vendor',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $vendor->assignRole('vendor');
-
-
-        // MANAJEMEN
-        $manajemen = User::firstOrCreate(
-            ['email' => 'manajemen@local.test'],
-            [
-                'name' => 'Manajemen',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $manajemen->assignRole('manajemen');
     }
 }
