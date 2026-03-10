@@ -26,4 +26,20 @@ class VendorMedicinePrice extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+
+            if ($model->price !== null) {
+
+                $discount = $model->discount_percent ?? 0;
+
+                $model->final_price =
+                    $model->price - ($model->price * $discount / 100);
+            }
+        });
+    }
 }

@@ -6,6 +6,7 @@ use App\Exports\VendorTemplateExport;
 use App\Imports\VendorPriceImport;
 use App\Models\VendorMedicinePrice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class VendorPriceController extends Controller
@@ -63,16 +64,20 @@ class VendorPriceController extends Controller
 
         $vendor = auth()->user()->vendor;
 
+        DB::beginTransaction();
+
         try {
 
             $import = new VendorPriceImport($vendor->id);
 
             Excel::import($import, $request->file('file'));
 
-            // Update last upload
+            // update last upload
             $vendor->update([
                 'last_upload_at' => now(),
             ]);
+
+            DB::commit();
 
             return redirect()
                 ->route('vendor.prices.index')
@@ -82,8 +87,10 @@ class VendorPriceController extends Controller
 
         } catch (\Exception $e) {
 
+            DB::rollBack();
+
             return back()
-                ->with('error', 'Upload gagal. Periksa format file.');
+                ->with('error', 'Upload gagal: '.$e->getMessage());
         }
     }
 

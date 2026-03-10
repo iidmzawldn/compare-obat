@@ -23,77 +23,74 @@ class VendorPriceImport implements ToCollection, WithHeadingRow
         $this->vendorId = $vendorId;
     }
 
+     public function headingRow(): int
+    {
+        return 4; // karena header ada di row 4
+    }
+
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
+        foreach ($rows as $index => $row) {
+
+            $rowNumber = $index + 2; // karena heading row
 
             $this->total++;
 
-            // Bersihkan input dasar
             $code = trim($row['code'] ?? '');
             $priceRaw = trim($row['price'] ?? '');
 
-            // 🔥 Flexible discount reader
-            $discountRaw = trim(
-                $row['discount_percent']
-                ?? $row['discount']
-                ?? $row['diskon']
-                ?? $row['discount_']
-                ?? ''
-            );
-
-            // Validasi wajib
-            if ($code === '' || $priceRaw === '') {
-                $this->skipped++;
-
-                continue;
+            if ($code === '') {
+                throw new \Exception("Kode kosong di baris {$rowNumber}");
             }
 
-            // Bersihkan format angka (hapus titik ribuan, ubah koma jadi titik)
+            if ($priceRaw === '') {
+                throw new \Exception("Harga kosong di baris {$rowNumber}");
+            }
+
+            // Bersihkan angka
             $priceRaw = str_replace(['.', ','], ['', '.'], $priceRaw);
 
             if (! is_numeric($priceRaw)) {
-                $this->skipped++;
-
-                continue;
+                throw new \Exception("Harga tidak valid di baris {$rowNumber}");
             }
 
             $price = (float) $priceRaw;
 
             if ($price <= 0) {
-                $this->skipped++;
-
-                continue;
-            }
-
-            // Default discount 0
-            $discountPercent = 0;
-
-            if ($discountRaw !== '') {
-
-                $discountRaw = str_replace(['%', ',', '.'], ['', '.', ''], $discountRaw);
-
-                if (is_numeric($discountRaw)) {
-                    $discountPercent = (float) $discountRaw;
-
-                    // Batasi 0 - 100
-                    if ($discountPercent < 0 || $discountPercent > 100) {
-                        $this->skipped++;
-
-                        continue;
-                    }
-                }
+                throw new \Exception("Harga harus lebih dari 0 di baris {$rowNumber}");
             }
 
             $medicine = Medicine::where('code', $code)->first();
 
             if (! $medicine) {
-                $this->skipped++;
-
-                continue;
+                throw new \Exception("Kode obat {$code} tidak ditemukan (baris {$rowNumber})");
             }
 
-            // Hitung final price
+            // Optional discount
+            $discountPercent = 0;
+
+            $discountRaw = trim(
+                $row['discount_percent']
+                ?? $row['discount']
+                ?? $row['diskon']
+                ?? ''
+            );
+
+            if ($discountRaw !== '') {
+
+                $discountRaw = str_replace(['%', ',', '.'], ['', '.', ''], $discountRaw);
+
+                if (! is_numeric($discountRaw)) {
+                    throw new \Exception("Format diskon salah di baris {$rowNumber}");
+                }
+
+                $discountPercent = (float) $discountRaw;
+
+                if ($discountPercent < 0 || $discountPercent > 100) {
+                    throw new \Exception("Diskon harus 0-100% di baris {$rowNumber}");
+                }
+            }
+
             $finalPrice = round(
                 $price - ($price * $discountPercent / 100),
                 2

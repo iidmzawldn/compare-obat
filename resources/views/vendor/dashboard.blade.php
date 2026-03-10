@@ -8,24 +8,21 @@
 
 @section('content')
 
-<div class="row">
+    <div class="row">
 
-    <div class="col-md-4">
-        <div class="small-box bg-primary">
-            <div class="inner">
-                <h4>Kelola Harga</h4>
-                <p>Upload & Update Harga Obat</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-file-excel"></i>
-            </div>
-            <a href="{{ route('vendor.prices.index') }}"
-               class="small-box-footer">
-                Masuk <i class="fas fa-arrow-circle-right"></i>
-            </a>
+        <div class="col-md-3">
+            <x-adminlte-small-box title="{{ $totalMedicines }}" text="Total Obat Aktif" icon="fas fa-pills" theme="info" />
         </div>
+
+        <div class="col-md-3">
+            <x-adminlte-small-box title="{{ $totalPrices }}" text="Harga Sudah Diisi" icon="fas fa-file-excel"
+                theme="success" />
+        </div>
+
+        <div class="col-md-3">
+            <x-adminlte-small-box title="{{ $notFilled }}" text="Belum Diisi" icon="fas fa-exclamation-triangle"
+                theme="warning" />
+        </div>
+
     </div>
-
-</div>
-
 @stop
