@@ -53,7 +53,7 @@
                 <tbody>
                     @forelse ($medicines as $medicine)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $medicines->firstItem() + $loop->index }}</td>
                             <td>{{ $medicine->code }}</td>
                             <td>{{ $medicine->name }}</td>
                             <td>{{ $medicine->category }}</td>
@@ -93,7 +93,7 @@
                     @endforelse
                 </tbody>
             </table>
-
+            
             <div class="mt-3">
                 {{ $medicines->appends(request()->query())->links() }}
             </div>

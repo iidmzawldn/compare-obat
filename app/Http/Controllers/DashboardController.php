@@ -77,7 +77,30 @@ class DashboardController extends Controller
 
     public function farmasi()
     {
-        return view('farmasi.dashboard');
+        $totalMedicines = Medicine::where('status', 1)->count();
+
+        $totalVendors = Vendor::where('status', 1)->count();
+
+        $totalPrices = VendorMedicinePrice::count();
+
+        // obat yang belum ada harga vendor
+        $medicineNoPrice = Medicine::where('status', 1)
+            ->whereDoesntHave('vendorPrices')
+            ->count();
+
+        // harga yang terakhir diupdate
+        $recentPrices = VendorMedicinePrice::with(['medicine', 'vendor'])
+            ->latest('updated_at')
+            ->limit(10)
+            ->get();
+
+        return view('farmasi.dashboard', compact(
+            'totalMedicines',
+            'totalVendors',
+            'totalPrices',
+            'medicineNoPrice',
+            'recentPrices'
+        ));
     }
 
     public function vendor()
